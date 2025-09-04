@@ -1,17 +1,26 @@
+// frontend/src/components/Navbar.jsx
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  const links = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Login", path: "/login" },
-    { name: "Signup", path: "/signup" },
-    { name: "Forgot Password", path: "/forgot-password" },
-    { name: "Verify OTP", path: "/verify-otp" },
-    { name: "Reset Password", path: "/reset-password" },
-  ];
+  const links = token
+    ? [
+        { name: "Dashboard", path: "/dashboard" },
+        { name: "Logout", action: () => { 
+            localStorage.removeItem("token"); 
+            navigate("/login"); 
+          } 
+        },
+      ]
+    : [
+        { name: "Login", path: "/login" },
+        { name: "Signup", path: "/signup" },
+        { name: "Forgot Password", path: "/forgot-password" },
+      ];
 
   return (
     <nav className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white shadow-lg sticky top-0 z-50">
@@ -27,21 +36,31 @@ export default function Navbar() {
 
           {/* Desktop Links */}
           <div className="hidden md:flex space-x-6">
-            {links.map((link) => (
-              <NavLink
-                key={link.name}
-                to={link.path}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-semibold tracking-wide transition duration-300 ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "text-gray-300 hover:text-white hover:bg-gray-700"
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+            {links.map((link) =>
+              link.action ? (
+                <button
+                  key={link.name}
+                  onClick={link.action}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold tracking-wide text-gray-300 hover:text-white hover:bg-gray-700 transition duration-300"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `px-4 py-2 rounded-lg text-sm font-semibold tracking-wide transition duration-300 ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -78,22 +97,32 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-gray-800 border-t border-gray-700 animate-slide-down">
           <div className="px-4 py-3 space-y-2">
-            {links.map((link) => (
-              <NavLink
-                key={link.name}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `block px-3 py-2 rounded-lg text-base font-medium transition duration-300 ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "text-gray-300 hover:text-white hover:bg-gray-700"
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+            {links.map((link) =>
+              link.action ? (
+                <button
+                  key={link.name}
+                  onClick={() => { link.action(); setIsOpen(false); }}
+                  className="block px-3 py-2 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                >
+                  {link.name}
+                </button>
+              ) : (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    `block px-3 py-2 rounded-lg text-base font-medium transition duration-300 ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              )
+            )}
           </div>
         </div>
       )}

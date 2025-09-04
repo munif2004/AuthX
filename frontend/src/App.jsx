@@ -1,35 +1,32 @@
-// frontend/src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
-import Signup from "./pages/Signup";
-import VerifyOtp from "./pages/Verifyotp";
-import Login from "./pages/Login";
+import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Input from "../src/components/Input";
-import Navbar from "../src/components/Navbar";
-import Button from "../src/components/Buttton"; // ✅ fixed spelling
 
-// Protected Route Component
+// Components
+import Navbar from "./components/Navbar";
+
+// Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" />;
+  if (!token) return <Navigate to="/auth" />;
   return children;
 };
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-900 text-white">
-        <Navbar/>
+      <div className="min-h-screen bg-gray-100 text-gray-900">
+        <Navbar />
         <Routes>
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/login" element={<Login />} /> {/* ✅ fixed */}
+          {/* Auth routes */}
+          <Route path="/auth" element={<AuthPage />} />
+
+          {/* Protected Dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -38,12 +35,12 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/input" element={<Input />} />
-          <Route path="/button" element={<Button />} />
+
+          {/* Default route redirects to /auth */}
+          <Route path="*" element={<Navigate to="/auth" />} />
         </Routes>
       </div>
+
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
